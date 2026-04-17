@@ -1,0 +1,24 @@
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const Stock = require('../models/Stock');
+
+module.exports = {
+    data: new SlashCommandBuilder()
+        .setName('stock')
+        .setDescription('View stock'),
+
+    async execute(interaction) {
+        const free = await Stock.findOne({ type: 'free' });
+        const premium = await Stock.findOne({ type: 'premium' });
+        const booster = await Stock.findOne({ type: 'booster' });
+
+        const embed = new EmbedBuilder()
+            .setTitle('📦 Stock')
+            .addFields(
+                { name: 'Free', value: `${free?.items.length || 0}`, inline: true },
+                { name: 'Premium', value: `${premium?.items.length || 0}`, inline: true },
+                { name: 'Booster', value: `${booster?.items.length || 0}`, inline: true }
+            );
+
+        interaction.reply({ embeds: [embed], ephemeral: true });
+    }
+};
